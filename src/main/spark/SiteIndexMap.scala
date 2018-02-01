@@ -4,13 +4,13 @@ import org.apache.spark.SparkConf
 import scala.collection.mutable
 import scala.io.Source
 
-object WordCount {
-  val inputFile = "F:/data/xinshang/beijing/"
-  val hosthcInputFile = "F:/data/xinshang/hosthc.txt"
-  val conf = new SparkConf().setAppName("WordCount").setMaster("local")
-  val sc = new SparkContext(conf)
-  // 数据文件
-  val textFile = sc.textFile(inputFile)
+/**
+  * 将数据中的站点索引映射成站点名称
+  */
+object SiteIndexMap {
+  val inputFile = "C:\\data\\xinshang\\180201\\part-r-00000"
+  val hosthcInputFile = "C:\\data\\xinshang\\hosthc.txt"
+
   // 匹配文件
   val hostMap = new mutable.HashMap[String, String]()
   val file = Source.fromFile(hosthcInputFile)
@@ -19,13 +19,17 @@ object WordCount {
   })
 
   def main(args: Array[String]) {
+    val conf = new SparkConf().setAppName("indexMap").setMaster("local")
+    val sc = new SparkContext(conf)
+    // 数据文件
+    val textFile = sc.textFile(inputFile)
 
     val data = textFile.map(line => (line.split("\\|")(0), line.split("\\|")(1)))
       .mapValues(
       value => value.split(";")
         .toList.map(getKey).mkString(";")).map(kv => kv._1 + "|" + kv._2);
 
-    data.saveAsTextFile("F:/data/xinshang/out")
+    data.saveAsTextFile("C:/data/xinshang/180201/out")
 //    data.saveAsTextFile()
 //    println(getKey("U0:5"))
   }
